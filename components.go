@@ -39,6 +39,15 @@ type Component struct {
 	StatusName  string `json:"status_name,omitempty"`
 }
 
+// ComponentSearch entity used to search all components
+type ComponentSearch struct {
+	ID        int 		`url:"id,omitempty"`
+	Name      string  `url:"name,omitempty"`
+	Status    int     `url:"status,omitempty"`
+	GroupID  	int     `url:"group_id,omitempty"`
+	Enabled   bool    `url:"enabled,omitempty"`
+}
+
 // ComponentGroup entity reflects one single component group
 type ComponentGroup struct {
 	ID        int    `json:"id,omitempty"`
@@ -99,6 +108,22 @@ func (s *ComponentsService) Get(id int) (*Component, *Response, error) {
 
 	resp, err := s.client.Call("GET", u, nil, v)
 	return v.Data, resp, err
+}
+
+// Search for components.
+//
+// Docs: https://docs.cachethq.io/docs/get-a-component
+func (s *ComponentsService) Search(c *ComponentSearch) (*ComponentResponse, *Response, error) {
+	u := "api/v1/components"
+	v := new(ComponentResponse)
+	u, err := addOptions(u, c)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Call("GET", u, nil, v)
+	return v, resp, err
 }
 
 // Create a new component.

@@ -48,6 +48,14 @@ type ComponentSearch struct {
 	Enabled   bool    `url:"enabled,omitempty"`
 }
 
+// ComponentGroupSearch entity used to search all component groups
+type ComponentGroupSearch struct {
+	ID				int 		`url:"id,omitempty"`
+	Name			string  `url:"name,omitempty"`
+	Collapsed string  `url:"collapsed,omitempty"`
+	Visible 	string  `url:"visible,omitempty"`
+}
+
 // ComponentGroup entity reflects one single component group
 type ComponentGroup struct {
 	ID        int    `json:"id,omitempty"`
@@ -162,6 +170,22 @@ func (s *ComponentsService) Delete(id int) (*Response, error) {
 //
 // Docs: https://docs.cachethq.io/docs/get-componentgroups
 func (s *ComponentsService) GetAllGroups(opt *ListOptions) (*ComponentGroupResponse, *Response, error) {
+	u := "api/v1/components/groups"
+	v := new(ComponentGroupResponse)
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Call("GET", u, nil, v)
+	return v, resp, err
+}
+
+// SearchGroups return all component groups that match search criteria
+//
+// Docs: https://docs.cachethq.io/docs/get-componentgroups
+func (s *ComponentsService) SearchGroups(opt *ComponentGroupSearch) (*ComponentGroupResponse, *Response, error) {
 	u := "api/v1/components/groups"
 	v := new(ComponentGroupResponse)
 

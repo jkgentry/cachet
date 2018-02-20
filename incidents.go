@@ -46,6 +46,14 @@ type Incident struct {
 	Notify          bool   `json:"notify,omitempty"`
 }
 
+type IncidentSearch struct {
+	ID        	int 		`url:"id,omitempty"`
+	ComponentID	int			`url:"component_id,omitempty"`
+	Name      	string  `url:"name,omitempty"`
+	Status    	int     `url:"status,omitempty"`
+	Visibile   	bool    `url:"enabled,omitempty"`
+}
+
 // IncidentResponse reflects the response of /incidents call
 type IncidentResponse struct {
 	Meta      Meta       `json:"meta,omitempty"`
@@ -67,6 +75,22 @@ func (s *IncidentsService) GetAll(opt *ListOptions) (*IncidentResponse, *Respons
 	v := new(IncidentResponse)
 
 	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := s.client.Call("GET", u, nil, v)
+	return v, resp, err
+}
+
+// Search for components.
+//
+// Docs: https://docs.cachethq.io/docs/get-a-component
+func (s *IncidentsService) Search(c *IncidentSearch) (*IncidentResponse, *Response, error) {
+	u := "api/v1/incidents"
+	v := new(IncidentResponse)
+	u, err := addOptions(u, c)
+
 	if err != nil {
 		return nil, nil, err
 	}

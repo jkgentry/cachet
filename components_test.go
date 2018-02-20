@@ -331,6 +331,54 @@ func TestComponentsService_GetAllGroups(t *testing.T) {
 	}
 }
 
+func TestComponentsService_SearchGroups(t *testing.T) {
+	setup()
+	defer teardown()
+
+	testMux.HandleFunc("/api/v1/components/groups", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w, `{"meta":{"pagination":{"total":1,"count":1,"per_page":20,"current_page":1,"total_pages":1,"links":{"next_page":null,"previous_page":null}}},"data":[{"id":1,"name":"Websites","created_at":"2015-11-07 16:30:02","updated_at":"2015-11-07 16:30:02","order":1}]}`)
+	})
+
+	groupSearch := &ComponentGroupSearch {
+		Name: "Websites",
+	}
+
+	got, _, err := testClient.Components.SearchGroups(groupSearch)
+	if err != nil {
+		t.Errorf("Components.GetAllGroups returned error: %v", err)
+	}
+
+	expected := &ComponentGroupResponse{
+		Meta: Meta{
+			Pagination: Pagination{
+				Total:       1,
+				Count:       1,
+				PerPage:     20,
+				CurrentPage: 1,
+				TotalPages:  1,
+				Links: Links{
+					NextPage:     "",
+					PreviousPage: "",
+				},
+			},
+		},
+		ComponentGroups: []ComponentGroup{
+			{
+				ID:        1,
+				Name:      "Websites",
+				Order:     1,
+				CreatedAt: "2015-11-07 16:30:02",
+				UpdatedAt: "2015-11-07 16:30:02",
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("Components.GetAllGroups returned %+v, want %+v", got, expected)
+	}
+}
+
 func TestComponentsService_GetAllGroupsWithOptions(t *testing.T) {
 	setup()
 	defer teardown()
